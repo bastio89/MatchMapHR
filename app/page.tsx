@@ -250,12 +250,12 @@ export default function LandingPage() {
                 <CardHeader>
                   <FileCheck className="mb-2 h-8 w-8 text-primary" />
                   <CardTitle className="text-lg">
-                    {t.landing.features.audit.title}
+                    {t.landing.features.explainable.title}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    {t.landing.features.audit.description}
+                    {t.landing.features.explainable.description}
                   </p>
                 </CardContent>
               </Card>
@@ -264,12 +264,12 @@ export default function LandingPage() {
                 <CardHeader>
                   <Users className="mb-2 h-8 w-8 text-primary" />
                   <CardTitle className="text-lg">
-                    {t.landing.features.fairness.title}
+                    {t.landing.features.structured.title}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    {t.landing.features.fairness.description}
+                    {t.landing.features.structured.description}
                   </p>
                 </CardContent>
               </Card>
