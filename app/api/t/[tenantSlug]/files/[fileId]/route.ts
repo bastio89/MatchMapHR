@@ -77,7 +77,7 @@ export async function GET(
     const fileBuffer = await storage.download(file.storagePath)
 
     // Response mit korrektem Content-Type
-    return new NextResponse(fileBuffer, {
+    return new NextResponse(new Uint8Array(fileBuffer), {
       headers: {
         'Content-Type': file.mimeType,
         'Content-Disposition': `attachment; filename="${encodeURIComponent(file.filename)}"`,
