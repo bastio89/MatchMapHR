@@ -30,22 +30,19 @@ export async function getTenantContext(tenantSlug: string): Promise<TenantContex
   try {
     // 1. Session prüfen
     const authUser = await getServerSession()
-    
-    // Temporär: Wenn keine Session, versuche es trotzdem (für Testing)
-    // TODO: Das muss später entfernt werden
     if (!authUser) {
-      console.warn('No auth session found - this should not happen in production')
-      // Versuche trotzdem, User aus Cookie zu holen
-      const { cookies } = await import('next/headers')
-      const cookieStore = await cookies()
-      const accessToken = cookieStore.get('sb-access-token')
-      
-      if (!accessToken) {
-        return null
-      }
+      return null
     }
 
-    // 2. Tenant laden
+    // 2. User in DB finden
+    const user = await prisma.user.findUnique({
+      where: { email: authUser.email },
+    })
+    if (!user) {
+      return null
+    }
+
+    // 3. Tenant laden
     const tenant = await prisma.tenant.findUnique({
       where: { slug: tenantSlug },
     })
@@ -53,18 +50,21 @@ export async function getTenantContext(tenantSlug: string): Promise<TenantContex
       return null
     }
 
-    // 3. Finde IRGENDEIN User in diesem Tenant (temporär für Testing)
-    const tenantUser = await prisma.tenantUser.findFirst({
-      where: { tenantId: tenant.id },
-      include: { user: true },
+    // 4. TenantUser-Verbindung prüfen
+    const tenantUser = await prisma.tenantUser.findUnique({
+      where: {
+        tenantId_userId: {
+          tenantId: tenant.id,
+          userId: user.id,
+        },
+      },
     })
-    
     if (!tenantUser) {
       return null
     }
 
     return {
-      user: tenantUser.user,
+      user,
       tenant,
       tenantUser,
       role: tenantUser.role,

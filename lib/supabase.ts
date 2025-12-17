@@ -1,6 +1,7 @@
 import { createClientComponentClient, createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
+import jwt from 'jsonwebtoken'
 
 // Supabase Client für Server Components
 export function createServerSupabaseClient() {
@@ -33,23 +34,37 @@ export interface AuthUser {
   name?: string
 }
 
-// Session aus Supabase holen (Server-side)
+// Session aus JWT Token validieren (Server-side)
 export async function getServerSession(): Promise<AuthUser | null> {
   try {
-    const supabase = createServerSupabaseClient()
-    const { data: { session }, error } = await supabase.auth.getSession()
+    const cookieStore = await cookies()
+    const accessToken = cookieStore.get('sb-access-token')
     
-    if (error || !session?.user) {
+    if (!accessToken?.value) {
+      return null
+    }
+
+    // JWT Secret aus Environment
+    const jwtSecret = process.env.SUPABASE_JWT_SECRET
+    if (!jwtSecret) {
+      console.error('SUPABASE_JWT_SECRET not configured')
+      return null
+    }
+
+    // Token verifizieren
+    const decoded = jwt.verify(accessToken.value, jwtSecret) as any
+    
+    if (!decoded.sub || !decoded.email) {
       return null
     }
 
     return {
-      id: session.user.id,
-      email: session.user.email!,
-      name: session.user.user_metadata?.name,
+      id: decoded.sub,
+      email: decoded.email,
+      name: decoded.user_metadata?.name,
     }
   } catch (error) {
-    console.error('Error getting session:', error)
+    console.error('Error validating JWT token:', error)
     return null
   }
 }
