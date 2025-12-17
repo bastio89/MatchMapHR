@@ -1,0 +1,255 @@
+// Prisma Schema für MatchMap HR
+// Multi-Tenant SaaS für HR Bewerbungsanalyse
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// TENANT & USER MANAGEMENT
+// ============================================
+
+// Tenant (Firma/Organisation)
+model Tenant {
+  id        String   @id @default(cuid())
+  slug      String   @unique // URL-Slug für /t/[tenantSlug]/...
+  name      String   // Firmenname
+  plan      Plan     @default(STARTER)
+  logoUrl   String?  // Placeholder für Logo-Upload
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  tenantUsers     TenantUser[]
+  requests        Request[]
+  webhookEvents   WebhookEventLog[]
+  apiKeys         ApiKey[]
+
+  @@index([slug])
+}
+
+// Plan-Typen für Billing
+enum Plan {
+  STARTER    // Kostenlos, 1 Request Demo
+  PRO        // Bezahlt, X Requests/Monat
+  ENTERPRISE // Unlimited
+}
+
+// User (globaler Account)
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  avatarUrl    String?
+  // Auth wird über Supabase gehandhabt, passwordHash nur falls local auth
+  passwordHash String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  tenantUsers TenantUser[]
+  requests    Request[]    @relation("CreatedByUser")
+
+  @@index([email])
+}
+
+// TenantUser - Verbindung zwischen Tenant und User mit Rolle
+model TenantUser {
+  id        String     @id @default(cuid())
+  tenantId  String
+  userId    String
+  role      TenantRole @default(MEMBER)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  // Relations
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId])
+  @@index([tenantId])
+  @@index([userId])
+}
+
+// Rollen innerhalb eines Tenants
+enum TenantRole {
+  OWNER  // Volle Rechte, kann Tenant löschen
+  ADMIN  // Kann Team verwalten, Settings ändern
+  MEMBER // Kann Requests erstellen und einsehen
+}
+
+// ============================================
+// REQUEST & FILE MANAGEMENT
+// ============================================
+
+// Request (eine Analyse-Anfrage)
+model Request {
+  id              String        @id @default(cuid())
+  tenantId        String
+  createdByUserId String
+  
+  // Job-Details
+  jobTitle        String
+  department      String?       // Optional: Abteilung
+  seniority       String?       // Optional: Junior/Mid/Senior
+  
+  // Status-Tracking
+  status          RequestStatus @default(DRAFT)
+  paymentStatus   PaymentStatus @default(UNPAID)
+  
+  // n8n Integration
+  n8nExecutionId  String?       // ID der n8n Execution
+  
+  // Timestamps
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  completedAt     DateTime?     // Wann die Analyse abgeschlossen wurde
+
+  // Relations
+  tenant           Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  createdBy        User              @relation("CreatedByUser", fields: [createdByUserId], references: [id])
+  jobFile          JobFile?          // Eine Stellenausschreibung
+  applicantFiles   ApplicantFile[]   // Mehrere Bewerbungen
+  resultCandidates ResultCandidate[] // Ergebnisse
+  webhookEvents    WebhookEventLog[]
+
+  @@index([tenantId])
+  @@index([createdByUserId])
+  @@index([status])
+}
+
+// Request Status Flow: DRAFT → QUEUED → RUNNING → DONE | FAILED
+enum RequestStatus {
+  DRAFT           // Noch nicht gestartet
+  PENDING_PAYMENT // Wartet auf Zahlung
+  QUEUED          // In Warteschlange für n8n
+  RUNNING         // n8n verarbeitet gerade
+  DONE            // Erfolgreich abgeschlossen
+  FAILED          // Fehler bei der Verarbeitung
+}
+
+// Payment Status
+enum PaymentStatus {
+  UNPAID  // Noch nicht bezahlt
+  PENDING // Zahlung wird verarbeitet
+  PAID    // Bezahlt
+  WAIVED  // Erlassen (z.B. Demo)
+}
+
+// JobFile (Stellenausschreibung)
+model JobFile {
+  id            String   @id @default(cuid())
+  requestId     String   @unique // Nur eine Stellenausschreibung pro Request
+  filename      String   // Original-Dateiname
+  mimeType      String   // z.B. application/pdf
+  storagePath   String   // Pfad im Dateisystem
+  fileSize      Int      // Größe in Bytes
+  extractedText String?  @db.Text // Extrahierter Text (optional, für Suche)
+  createdAt     DateTime @default(now())
+
+  // Relations
+  request Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+}
+
+// ApplicantFile (Bewerbung)
+model ApplicantFile {
+  id            String   @id @default(cuid())
+  requestId     String
+  filename      String   // Original-Dateiname
+  mimeType      String   // z.B. application/pdf
+  storagePath   String   // Pfad im Dateisystem
+  fileSize      Int      // Größe in Bytes
+  extractedText String?  @db.Text // Extrahierter Text (optional)
+  createdAt     DateTime @default(now())
+
+  // Relations
+  request Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+}
+
+// ============================================
+// RESULTS
+// ============================================
+
+// ResultCandidate (Ergebnis für einen Kandidaten)
+model ResultCandidate {
+  id              String   @id @default(cuid())
+  requestId       String
+  
+  // Kandidaten-Daten
+  candidateName   String
+  email           String?  // Falls aus Bewerbung extrahiert
+  
+  // Scoring & Matching
+  score           Int      // 0-100 Score
+  
+  // JSON-Felder für flexible Datenstrukturen
+  skillsJson      Json?    // Extrahierte Skills: { "skills": ["Python", "React", ...] }
+  highlightsJson  Json?    // Skill-Matches: { "matches": [{ "skill": "Python", "evidence": "..." }] }
+  missingSkillsJson Json?  // Fehlende Skills: { "missing": ["Kubernetes", ...] }
+  
+  summary         String?  @db.Text // Kurze Zusammenfassung
+  
+  createdAt       DateTime @default(now())
+
+  // Relations
+  request Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+  @@index([score])
+}
+
+// ============================================
+// WEBHOOK & AUDIT
+// ============================================
+
+// WebhookEventLog (Audit Trail für n8n Callbacks und Events)
+model WebhookEventLog {
+  id          String   @id @default(cuid())
+  tenantId    String
+  requestId   String?  // Optional, falls Request-bezogen
+  
+  eventType   String   // z.B. "N8N_CALLBACK", "REQUEST_STARTED", "PAYMENT_RECEIVED"
+  payloadJson Json     // Kompletter Payload für Debugging
+  
+  createdAt   DateTime @default(now())
+
+  // Relations
+  tenant  Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  request Request? @relation(fields: [requestId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId])
+  @@index([requestId])
+  @@index([eventType])
+  @@index([createdAt])
+}
+
+// ============================================
+// API KEYS
+// ============================================
+
+// ApiKey für Tenant (z.B. für externe Integrationen)
+model ApiKey {
+  id          String   @id @default(cuid())
+  tenantId    String
+  name        String   // Beschreibender Name
+  keyHash     String   // Gehashter Key (der echte Key wird nur einmal angezeigt)
+  keyPrefix   String   // Erste 8 Zeichen für Identifikation
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([keyHash])
+}
