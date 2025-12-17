@@ -63,84 +63,118 @@ export const t = {
   // ============================================
   landing: {
     hero: {
-      title: 'Stellenausschreibungen + Bewerbungen',
-      titleHighlight: '→ Skills + Ranking in Minuten',
-      subtitle: 'Automatisierte Bewerberanalyse mit KI-gestütztem Skill-Matching. DSGVO-konform, transparent, effizient.',
+      title: 'Bewerbungs-Screening in Minuten',
+      titleHighlight: 'statt Stunden',
+      subtitle: 'Skill-basiertes Ranking für Ihre Kandidaten. Strukturiert, nachvollziehbar, zeitsparend. Wir ersetzen nicht Recruiter – wir ersetzen das manuelle Screening.',
       cta: 'Kostenlos testen',
-      ctaSecondary: 'Demo ansehen',
+      ctaSecondary: 'Beispiel ansehen',
+      badges: [
+        'Time-to-Screen ↓ 75%',
+        'Strukturierte Kriterien',
+        'DSGVO-konform',
+      ],
+    },
+    problem: {
+      title: 'Das Problem: Manuelles Screening kostet Zeit und Objektivität',
+      pain1: 'Stunden pro Kandidat für CV-Durchsicht',
+      pain2: 'Subjektive Bewertungen ohne einheitliche Kriterien',
+      pain3: 'Überlastete Recruiter, verzögerte Rückmeldungen',
+      solution: 'Unsere Lösung: Skill-basierte Vorauswahl mit nachvollziehbarem Ranking',
     },
     steps: {
-      title: 'So funktioniert es',
+      title: 'So funktioniert es – in 3 einfachen Schritten',
       step1: {
-        title: 'Hochladen',
-        description: 'Laden Sie Ihre Stellenausschreibung und Bewerbungen hoch (PDF, DOCX, TXT)',
+        title: '1. Stellenausschreibung hochladen',
+        description: 'PDF, DOCX oder TXT – unser System extrahiert automatisch die geforderten Skills',
       },
       step2: {
-        title: 'Analyse',
-        description: 'Unsere KI extrahiert Skills und erstellt ein detailliertes Matching',
+        title: '2. Bewerbungen hochladen',
+        description: 'Alle Kandidaten-CVs auf einmal – das Tool analysiert Skills, Erfahrung und Passgenauigkeit',
       },
       step3: {
-        title: 'Ergebnis',
-        description: 'Erhalten Sie ein Ranking mit Score, Skills und Empfehlungen',
+        title: '3. Ranking erhalten',
+        description: 'Strukturiertes Ergebnis mit Score, Skill-Matches und fehlenden Qualifikationen – bereit für Ihre Entscheidung',
+      },
+    },
+    kpiBenefits: {
+      title: 'Typische Vorteile in HR-Teams',
+      subtitle: 'Viele unserer Kunden berichten von messbaren Verbesserungen',
+      metric1: {
+        label: 'Time-to-Screen',
+        before: '2–4 Stunden pro Stelle',
+        after: 'Unter 30 Minuten',
+        description: 'Screening-Zeit kann typischerweise um 70–80% reduziert werden',
+      },
+      metric2: {
+        label: 'Recruiter-Stunden pro Hire',
+        before: '15–25 Stunden',
+        after: '8–12 Stunden',
+        description: 'Mehr Zeit für qualifizierte Gespräche statt Lebenslauf-Durchsicht',
+      },
+      metric3: {
+        label: 'Interview-to-Hire Ratio',
+        before: '4–6 Interviews',
+        after: '2–3 Interviews',
+        description: 'Bessere Vorauswahl führt zu gezielteren Einladungen',
       },
     },
     features: {
-      title: 'Warum MatchMap HR?',
+      title: 'Vertrauen durch Transparenz und Compliance',
       gdpr: {
-        title: 'DSGVO-Konform',
-        description: 'Ihre Daten werden sicher in der EU verarbeitet und auf Wunsch gelöscht',
+        title: 'DSGVO-konform',
+        description: 'Alle Daten bleiben in der EU. Sie behalten volle Kontrolle – Löschung jederzeit auf Anfrage möglich',
       },
-      multiTenant: {
-        title: 'Multi-Tenant',
-        description: 'Separate Arbeitsbereiche für Teams und Abteilungen',
+      explainable: {
+        title: 'Nachvollziehbare Bewertung',
+        description: 'Jeder Score basiert auf vergleichbaren Kriterien. Keine Blackbox – Sie sehen, warum ein Kandidat passt',
       },
-      audit: {
-        title: 'Audit Trail',
-        description: 'Vollständige Nachverfolgbarkeit aller Aktionen',
+      structured: {
+        title: 'Einheitliche Kriterien',
+        description: 'Alle Kandidaten werden nach denselben Maßstäben bewertet – für faire, strukturierte Entscheidungen',
       },
-      export: {
-        title: 'Export',
-        description: 'Ergebnisse als CSV oder PDF exportieren',
+      access: {
+        title: 'Rollen & Zugriffsrechte',
+        description: 'Separate Bereiche für Teams, kontrollierter Zugang, vollständiges Audit-Log aller Aktionen',
       },
     },
     pricing: {
-      title: 'Pricing',
-      subtitle: 'Wählen Sie den Plan, der zu Ihnen passt',
+      title: 'Transparente Preise',
+      subtitle: 'Starten Sie kostenlos – upgraden Sie bei Bedarf',
       starter: {
         name: 'Starter',
         price: 'Kostenlos',
-        description: '1 Analyse zum Testen',
+        description: 'Perfekt zum Testen',
+        impact: 'Sparen Sie typischerweise 2–3 Stunden bei Ihrer ersten Analyse',
         features: [
           '1 Analyse kostenlos',
           'Bis zu 10 Bewerbungen',
-          'Basis-Ranking',
+          'Skill-basiertes Ranking',
           'PDF Export',
         ],
       },
       pro: {
         name: 'Pro',
         price: '€99/Monat',
-        description: 'Für wachsende Teams',
+        description: 'Für HR-Teams, die regelmäßig einstellen',
+        impact: 'Kann Time-to-Hire um mehrere Tage verkürzen',
         features: [
           '50 Analysen/Monat',
-          'Unbegrenzte Bewerbungen',
+          'Unbegrenzte Bewerbungen pro Analyse',
           'Detailliertes Skill-Matching',
           'CSV & PDF Export',
           'Team-Zugang (5 User)',
-          'Priority Support',
         ],
       },
       enterprise: {
         name: 'Enterprise',
         price: 'Auf Anfrage',
-        description: 'Für große Organisationen',
+        description: 'Für Organisationen mit hohem Einstellungsbedarf',
+        impact: 'Skalierbare Lösung für Dutzende offener Stellen',
         features: [
           'Unbegrenzte Analysen',
-          'Unbegrenzte Bewerbungen',
+          'API-Zugang für ATS-Integration',
           'Custom Skill-Gewichtung',
-          'API-Zugang',
-          'Unbegrenzte User',
-          'Dedicated Support',
+          'Dedizierter Support',
           'On-Premise Option',
         ],
       },
@@ -149,20 +183,36 @@ export const t = {
       title: 'Häufig gestellte Fragen',
       items: [
         {
-          question: 'Welche Dateiformate werden unterstützt?',
-          answer: 'Wir unterstützen PDF, DOCX und TXT Dateien bis zu 10MB.',
-        },
-        {
-          question: 'Wie werden meine Daten geschützt?',
-          answer: 'Alle Daten werden verschlüsselt übertragen und in der EU gespeichert. Sie können jederzeit eine vollständige Löschung beantragen.',
-        },
-        {
           question: 'Wie kommt das Ranking zustande?',
-          answer: 'Unsere KI extrahiert Skills aus der Stellenausschreibung und den Bewerbungen, vergleicht diese und berechnet einen Score basierend auf Übereinstimmung und Erfahrungslevel.',
+          answer: 'Das Tool extrahiert Skills aus der Stellenausschreibung und gleicht sie mit den Bewerbungen ab. Jeder Kandidat erhält einen Score basierend auf Skill-Übereinstimmung, Erfahrungslevel und Relevanz. Sie sehen transparent, welche Skills gefunden wurden und welche fehlen.',
         },
         {
-          question: 'Kann ich das Ergebnis bearbeiten?',
-          answer: 'Die Ergebnisse sind read-only, aber Sie können sie exportieren und in Ihrem ATS weiterverarbeiten.',
+          question: 'Ist die Bewertung objektiv oder gibt es Bias?',
+          answer: 'Das System bewertet anhand strukturierter Kriterien ohne persönliche Voreingenommenheit. Allerdings: Die Qualität hängt von der Stellenausschreibung ab. Wir empfehlen klare, skill-fokussierte Anforderungen. Eine finale menschliche Prüfung bleibt wichtig.',
+        },
+        {
+          question: 'Wie werden meine Daten geschützt (DSGVO)?',
+          answer: 'Alle Daten werden verschlüsselt in EU-Rechenzentren gespeichert. Sie können jederzeit eine vollständige Löschung beantragen. Wir verarbeiten nur, was für die Analyse nötig ist, und geben nichts an Dritte weiter.',
+        },
+        {
+          question: 'Kann ich nachvollziehen, warum ein Kandidat einen bestimmten Score hat?',
+          answer: 'Ja. Sie sehen für jeden Kandidaten: gefundene Skills, Highlights (wo er besonders stark passt), fehlende Skills und eine Zusammenfassung. So können Sie die Bewertung nachvollziehen und eigene Gewichtungen vornehmen.',
+        },
+        {
+          question: 'Was passiert mit den Daten nach der Analyse?',
+          answer: 'Die Dokumente bleiben so lange gespeichert, bis Sie sie löschen. Sie haben jederzeit volle Kontrolle. Auf Wunsch können Sie einzelne Anfragen oder Ihren gesamten Account inklusive aller Daten entfernen.',
+        },
+        {
+          question: 'Welche Dateiformate werden unterstützt?',
+          answer: 'PDF, DOCX und TXT bis zu 10 MB pro Datei. Das deckt die meisten Lebensläufe und Stellenausschreibungen ab.',
+        },
+        {
+          question: 'Kann ich das Tool in unser bestehendes ATS integrieren?',
+          answer: 'Im Enterprise-Plan bieten wir API-Zugang für Integrationen. Im Starter/Pro-Plan können Sie Ergebnisse als CSV oder PDF exportieren und manuell in Ihr System übertragen.',
+        },
+        {
+          question: 'Ersetzt das Tool unsere Recruiter?',
+          answer: 'Nein. Es ersetzt das manuelle Screening und spart Zeit bei der Vorauswahl. Die finale Entscheidung, Gespräche und kulturelle Passung bleiben bei Ihnen. Wir unterstützen – wir ersetzen nicht.',
         },
       ],
     },

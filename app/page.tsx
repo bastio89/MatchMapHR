@@ -4,16 +4,22 @@ import {
   Sparkles,
   ListChecks,
   Shield,
-  Building2,
+  Clock,
+  Target,
+  TrendingDown,
   FileSearch,
-  FileDown,
   Check,
+  CheckCircle2,
   ChevronRight,
   ArrowRight,
+  Lock,
+  FileCheck,
+  Users,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import { Badge } from '@/components/ui/badge'
 import t from '@/lib/i18n'
 
 export default function LandingPage() {
@@ -56,6 +62,16 @@ export default function LandingPage() {
         <section className="relative overflow-hidden border-b bg-gradient-to-b from-muted/50 to-background py-20 md:py-32">
           <div className="container">
             <div className="mx-auto max-w-3xl text-center">
+              {/* KPI Badges */}
+              <div className="mb-6 flex flex-wrap justify-center gap-3">
+                {t.landing.hero.badges.map((badge: string, idx: number) => (
+                  <Badge key={idx} variant="secondary" className="bg-purple-100 text-purple-900 border-purple-200">
+                    <Check className="mr-1.5 h-3.5 w-3.5" />
+                    {badge}
+                  </Badge>
+                ))}
+              </div>
+
               <h1 className="mb-6 text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">
                 {t.landing.hero.title}
                 <br />
@@ -79,6 +95,37 @@ export default function LandingPage() {
           </div>
           {/* Decorative gradient */}
           <div className="absolute -top-24 left-1/2 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
+        </section>
+
+        {/* Problem/Solution Section */}
+        <section className="py-20 bg-gradient-to-br from-red-50 to-orange-50">
+          <div className="container max-w-5xl">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4">{t.landing.problem.title}</h2>
+              <p className="text-lg text-muted-foreground">{t.landing.problem.subtitle}</p>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-3 mb-12">
+              {t.landing.problem.points.map((point: { title: string; description: string }, idx: number) => (
+                <Card key={idx} className="border-2 border-red-200 bg-white">
+                  <CardHeader>
+                    <CardTitle className="text-lg text-red-700 flex items-center gap-2">
+                      <Clock className="h-5 w-5" />
+                      {point.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground">{point.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <div className="text-center bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg p-8 border-2 border-purple-300">
+              <h3 className="text-2xl font-bold mb-3 text-purple-900">{t.landing.problem.solution.title}</h3>
+              <p className="text-lg text-purple-800 max-w-3xl mx-auto">{t.landing.problem.solution.description}</p>
+            </div>
+          </div>
         </section>
 
         {/* Steps Section */}
@@ -135,16 +182,59 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* KPI Benefits Section */}
+        <section className="py-20 bg-gradient-to-br from-green-50 to-emerald-50">
+          <div className="container max-w-5xl">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4">{t.landing.kpiBenefits.title}</h2>
+              <p className="text-lg text-muted-foreground">{t.landing.kpiBenefits.subtitle}</p>
+            </div>
+
+            <div className="grid gap-8 md:grid-cols-3">
+              {t.landing.kpiBenefits.metrics.map((metric: any, idx: number) => (
+                <Card key={idx} className="border-2 border-green-300 bg-white">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-green-900">{metric.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Vorher</p>
+                        <p className="text-2xl font-bold text-red-600">{metric.before}</p>
+                      </div>
+                      <ArrowRight className="h-6 w-6 text-green-600" />
+                      <div>
+                        <p className="text-sm text-muted-foreground">Nachher</p>
+                        <p className="text-2xl font-bold text-green-600">{metric.after}</p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{metric.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <div className="text-center mt-12">
+              <Link href="/auth/signup">
+                <Button size="lg" className="text-lg px-8 py-6">
+                  {t.landing.hero.cta}
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </section>
+
         {/* Features Section */}
         <section className="border-y bg-muted/30 py-20">
           <div className="container">
             <h2 className="mb-12 text-center text-3xl font-bold">
               {t.landing.features.title}
             </h2>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               <Card>
                 <CardHeader>
-                  <Shield className="mb-2 h-8 w-8 text-primary" />
+                  <Lock className="mb-2 h-8 w-8 text-primary" />
                   <CardTitle className="text-lg">
                     {t.landing.features.gdpr.title}
                   </CardTitle>
@@ -158,21 +248,7 @@ export default function LandingPage() {
 
               <Card>
                 <CardHeader>
-                  <Building2 className="mb-2 h-8 w-8 text-primary" />
-                  <CardTitle className="text-lg">
-                    {t.landing.features.multiTenant.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    {t.landing.features.multiTenant.description}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <FileSearch className="mb-2 h-8 w-8 text-primary" />
+                  <FileCheck className="mb-2 h-8 w-8 text-primary" />
                   <CardTitle className="text-lg">
                     {t.landing.features.audit.title}
                   </CardTitle>
@@ -186,14 +262,14 @@ export default function LandingPage() {
 
               <Card>
                 <CardHeader>
-                  <FileDown className="mb-2 h-8 w-8 text-primary" />
+                  <Users className="mb-2 h-8 w-8 text-primary" />
                   <CardTitle className="text-lg">
-                    {t.landing.features.export.title}
+                    {t.landing.features.fairness.title}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    {t.landing.features.export.description}
+                    {t.landing.features.fairness.description}
                   </p>
                 </CardContent>
               </Card>
@@ -227,6 +303,12 @@ export default function LandingPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
+                  <div className="mb-4 rounded-lg bg-green-50 p-3 border border-green-200">
+                    <p className="text-sm font-medium text-green-900">
+                      <Target className="inline h-4 w-4 mr-1" />
+                      {t.landing.pricing.starter.impact}
+                    </p>
+                  </div>
                   <ul className="space-y-2">
                     {t.landing.pricing.starter.features.map((feature, i) => (
                       <li key={i} className="flex items-center gap-2">
@@ -238,7 +320,7 @@ export default function LandingPage() {
                 </CardContent>
                 <CardFooter>
                   <Button className="w-full" variant="outline" asChild>
-                    <Link href="/auth/signup">Kostenlos starten</Link>
+                    <Link href="/auth/signup">Kostenlos testen</Link>
                   </Button>
                 </CardFooter>
               </Card>
@@ -260,6 +342,12 @@ export default function LandingPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
+                  <div className="mb-4 rounded-lg bg-green-50 p-3 border border-green-200">
+                    <p className="text-sm font-medium text-green-900">
+                      <Target className="inline h-4 w-4 mr-1" />
+                      {t.landing.pricing.pro.impact}
+                    </p>
+                  </div>
                   <ul className="space-y-2">
                     {t.landing.pricing.pro.features.map((feature, i) => (
                       <li key={i} className="flex items-center gap-2">
@@ -271,7 +359,7 @@ export default function LandingPage() {
                 </CardContent>
                 <CardFooter>
                   <Button className="w-full" asChild>
-                    <Link href="/auth/signup">Jetzt starten</Link>
+                    <Link href="/auth/signup">Kostenlos testen</Link>
                   </Button>
                 </CardFooter>
               </Card>
@@ -290,6 +378,12 @@ export default function LandingPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
+                  <div className="mb-4 rounded-lg bg-green-50 p-3 border border-green-200">
+                    <p className="text-sm font-medium text-green-900">
+                      <Target className="inline h-4 w-4 mr-1" />
+                      {t.landing.pricing.enterprise.impact}
+                    </p>
+                  </div>
                   <ul className="space-y-2">
                     {t.landing.pricing.enterprise.features.map((feature, i) => (
                       <li key={i} className="flex items-center gap-2">
@@ -332,20 +426,20 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="py-20">
-          <div className="container">
-            <div className="mx-auto max-w-2xl text-center">
-              <h2 className="mb-4 text-3xl font-bold">
-                Bereit, Zeit zu sparen?
-              </h2>
-              <p className="mb-8 text-muted-foreground">
-                Starten Sie noch heute mit Ihrer ersten kostenlosen Analyse und erleben Sie, wie einfach Bewerber-Matching sein kann.
-              </p>
-              <Button size="lg" asChild>
+        {/* Final CTA Section */}
+        <section className="py-20 bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+          <div className="container max-w-4xl text-center">
+            <h2 className="text-4xl font-bold mb-4">
+              Starten Sie jetzt – in unter 2 Minuten
+            </h2>
+            <p className="text-xl mb-8 text-purple-100">
+              Keine Kreditkarte erforderlich. Keine versteckten Kosten. DSGVO-konform.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button size="lg" variant="secondary" className="text-lg px-8 py-6" asChild>
                 <Link href="/auth/signup">
                   Kostenlos testen
-                  <ChevronRight className="ml-2 h-4 w-4" />
+                  <ChevronRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
             </div>
