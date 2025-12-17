@@ -85,13 +85,13 @@ export async function POST(request: NextRequest) {
             candidateName: result.candidateName,
             email: result.email,
             score: result.score,
-            skillsJson: result.skills ? { skills: result.skills } : null,
+            skillsJson: result.skills ? { skills: result.skills } : undefined,
             highlightsJson: result.highlights
               ? { highlights: result.highlights }
-              : null,
+              : undefined,
             missingSkillsJson: result.missingSkills
               ? { missing: result.missingSkills }
-              : null,
+              : undefined,
             summary: result.summary,
           },
         })
