@@ -76,10 +76,25 @@ export const t = {
     },
     problem: {
       title: 'Das Problem: Manuelles Screening kostet Zeit und Objektivität',
-      pain1: 'Stunden pro Kandidat für CV-Durchsicht',
-      pain2: 'Subjektive Bewertungen ohne einheitliche Kriterien',
-      pain3: 'Überlastete Recruiter, verzögerte Rückmeldungen',
-      solution: 'Unsere Lösung: Skill-basierte Vorauswahl mit nachvollziehbarem Ranking',
+      subtitle: 'HR-Teams verbringen zu viel Zeit mit manueller Vorauswahl – und verlieren dabei Top-Kandidaten.',
+      points: [
+        {
+          title: 'Zeitverschwendung',
+          description: 'Stunden pro Kandidat für CV-Durchsicht – Zeit, die für strategische Aufgaben fehlt',
+        },
+        {
+          title: 'Subjektive Bewertung',
+          description: 'Keine einheitlichen Kriterien führen zu inkonsistenten Entscheidungen',
+        },
+        {
+          title: 'Überlastung',
+          description: 'Recruiter am Limit, verzögerte Rückmeldungen schrecken Kandidaten ab',
+        },
+      ],
+      solution: {
+        title: 'Unsere Lösung',
+        description: 'Skill-basierte Vorauswahl mit nachvollziehbarem Ranking – damit Sie sich auf die richtigen Kandidaten konzentrieren können.',
+      },
     },
     steps: {
       title: 'So funktioniert es – in 3 einfachen Schritten',
@@ -99,24 +114,26 @@ export const t = {
     kpiBenefits: {
       title: 'Typische Vorteile in HR-Teams',
       subtitle: 'Viele unserer Kunden berichten von messbaren Verbesserungen',
-      metric1: {
-        label: 'Time-to-Screen',
-        before: '2–4 Stunden pro Stelle',
-        after: 'Unter 30 Minuten',
-        description: 'Screening-Zeit kann typischerweise um 70–80% reduziert werden',
-      },
-      metric2: {
-        label: 'Recruiter-Stunden pro Hire',
-        before: '15–25 Stunden',
-        after: '8–12 Stunden',
-        description: 'Mehr Zeit für qualifizierte Gespräche statt Lebenslauf-Durchsicht',
-      },
-      metric3: {
-        label: 'Interview-to-Hire Ratio',
-        before: '4–6 Interviews',
-        after: '2–3 Interviews',
-        description: 'Bessere Vorauswahl führt zu gezielteren Einladungen',
-      },
+      metrics: [
+        {
+          title: 'Time-to-Screen',
+          before: '2–4 Std.',
+          after: '<30 Min.',
+          description: 'Screening-Zeit kann typischerweise um 70–80% reduziert werden',
+        },
+        {
+          title: 'Recruiter-Stunden',
+          before: '15–25 Std.',
+          after: '8–12 Std.',
+          description: 'Mehr Zeit für qualifizierte Gespräche statt Lebenslauf-Durchsicht',
+        },
+        {
+          title: 'Interview-Ratio',
+          before: '4–6',
+          after: '2–3',
+          description: 'Bessere Vorauswahl führt zu gezielteren Einladungen',
+        },
+      ],
     },
     features: {
       title: 'Vertrauen durch Transparenz und Compliance',
