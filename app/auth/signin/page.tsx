@@ -39,9 +39,9 @@ export default function SignInPage() {
 
       // Redirect zum Tenant Dashboard
       if (data.tenantSlug) {
-        router.push(`/t/${data.tenantSlug}/app/dashboard`)
+        window.location.href = `/t/${data.tenantSlug}/app/dashboard`
       } else {
-        router.push('/auth/select-tenant')
+        window.location.href = '/auth/select-tenant'
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unbekannter Fehler')
