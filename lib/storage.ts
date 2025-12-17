@@ -1,10 +1,10 @@
 import fs from 'fs/promises'
 import path from 'path'
 import crypto from 'crypto'
+import { createClient } from '@supabase/supabase-js'
 
 // File Storage Abstraktion
-// Aktuell: Lokales Dateisystem
-// Später: S3-kompatibel (Interface ist vorbereitet)
+// Supabase Storage als primärer Provider
 
 export interface StorageProvider {
   upload(file: Buffer, options: UploadOptions): Promise<StorageResult>
@@ -28,7 +28,111 @@ export interface StorageResult {
 }
 
 // ============================================
-// LOKALER STORAGE PROVIDER
+// SUPABASE STORAGE PROVIDER
+// ============================================
+
+class SupabaseStorageProvider implements StorageProvider {
+  private supabase
+  private bucketName: string
+
+  constructor() {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+    this.bucketName = process.env.SUPABASE_STORAGE_BUCKET || 'matchmap-files'
+    
+    this.supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    })
+  }
+
+  async upload(file: Buffer, options: UploadOptions): Promise<StorageResult> {
+    // Pfad erstellen: [tenantId]/[requestId]/[type]/[filename]
+    const safeFilename = this.sanitizeFilename(options.filename)
+    const storagePath = `${options.tenantId}/${options.requestId}/${options.type}/${safeFilename}`
+
+    const { error } = await this.supabase.storage
+      .from(this.bucketName)
+      .upload(storagePath, file, {
+        contentType: options.mimeType,
+        upsert: false,
+      })
+
+    if (error) {
+      console.error('Supabase upload error:', error)
+      throw new Error(`File upload failed: ${error.message}`)
+    }
+
+    return {
+      storagePath,
+      fileSize: file.length,
+    }
+  }
+
+  async download(storagePath: string): Promise<Buffer> {
+    const { data, error } = await this.supabase.storage
+      .from(this.bucketName)
+      .download(storagePath)
+
+    if (error) {
+      throw new Error(`File download failed: ${error.message}`)
+    }
+
+    return Buffer.from(await data.arrayBuffer())
+  }
+
+  async delete(storagePath: string): Promise<void> {
+    const { error } = await this.supabase.storage
+      .from(this.bucketName)
+      .remove([storagePath])
+
+    if (error) {
+      console.error('Delete error:', error)
+    }
+  }
+
+  async exists(storagePath: string): Promise<boolean> {
+    const { data, error } = await this.supabase.storage
+      .from(this.bucketName)
+      .list(path.dirname(storagePath), {
+        search: path.basename(storagePath),
+      })
+
+    if (error) return false
+    return data.length > 0
+  }
+
+  async getSignedUrl(storagePath: string, expiresIn: number = 3600): Promise<string> {
+    const { data, error } = await this.supabase.storage
+      .from(this.bucketName)
+      .createSignedUrl(storagePath, expiresIn)
+
+    if (error) {
+      throw new Error(`Failed to create signed URL: ${error.message}`)
+    }
+
+    return data.signedUrl
+  }
+
+  private sanitizeFilename(filename: string): string {
+    // Nur sichere Zeichen erlauben
+    const sanitized = filename
+      .replace(/[^a-zA-Z0-9._-]/g, '_')
+      .replace(/_{2,}/g, '_')
+    
+    // Unique Suffix hinzufügen um Kollisionen zu vermeiden
+    const ext = path.extname(sanitized)
+    const base = path.basename(sanitized, ext)
+    const uniqueId = crypto.randomBytes(4).toString('hex')
+    
+    return `${base}_${uniqueId}${ext}`
+  }
+}
+
+// ============================================
+// LOKALER STORAGE PROVIDER (Fallback)
 // ============================================
 
 class LocalStorageProvider implements StorageProvider {
@@ -95,10 +199,8 @@ class LocalStorageProvider implements StorageProvider {
 
   async getSignedUrl(storagePath: string, expiresIn: number = 3600): Promise<string> {
     // Für lokalen Storage: Einfache Token-basierte URL
-    // In Production mit S3: Pre-signed URL
     const token = crypto.randomBytes(32).toString('hex')
     const baseUrl = process.env.APP_BASE_URL || 'http://localhost:3000'
-    // Hinweis: Token-Validierung müsste noch implementiert werden
     return `${baseUrl}/api/files/download?path=${encodeURIComponent(storagePath)}&token=${token}`
   }
 
@@ -167,12 +269,15 @@ let storageInstance: StorageProvider | null = null
 
 export function getStorage(): StorageProvider {
   if (!storageInstance) {
-    // Hier könnte basierend auf ENV zwischen Local und S3 gewechselt werden
-    // if (process.env.STORAGE_PROVIDER === 's3') {
-    //   storageInstance = new S3StorageProvider()
-    // } else {
-    storageInstance = new LocalStorageProvider()
-    // }
+    // Supabase Storage als primärer Provider, Local als Fallback
+    const useSupabase = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
+    
+    if (useSupabase) {
+      storageInstance = new SupabaseStorageProvider()
+    } else {
+      console.warn('Supabase Storage not configured, using local storage')
+      storageInstance = new LocalStorageProvider()
+    }
   }
   return storageInstance
 }
