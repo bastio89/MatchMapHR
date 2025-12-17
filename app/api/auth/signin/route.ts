@@ -88,16 +88,23 @@ export async function POST(request: NextRequest) {
       userId: user.id,
     })
 
-    // Session Token als Cookie setzen
+    // Session Token als Cookie setzen (Supabase Auth Helpers Format)
     if (signInData.session) {
-      response.cookies.set('sb-access-token', signInData.session.access_token, {
-        path: '/',
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7,
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+      const projectRef = supabaseUrl.split('//')[1]?.split('.')[0]
+      const cookieName = `sb-${projectRef}-auth-token`
+      
+      // Auth Helpers speichern Session als JSON
+      const sessionData = JSON.stringify({
+        access_token: signInData.session.access_token,
+        refresh_token: signInData.session.refresh_token,
+        expires_at: signInData.session.expires_at,
+        expires_in: signInData.session.expires_in,
+        token_type: signInData.session.token_type,
+        user: signInData.session.user,
       })
-      response.cookies.set('sb-refresh-token', signInData.session.refresh_token, {
+      
+      response.cookies.set(cookieName, sessionData, {
         path: '/',
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',

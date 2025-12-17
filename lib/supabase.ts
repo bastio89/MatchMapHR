@@ -38,9 +38,15 @@ export interface AuthUser {
 export async function getServerSession(): Promise<AuthUser | null> {
   try {
     const cookieStore = await cookies()
-    const accessToken = cookieStore.get('sb-access-token')
+    
+    // Supabase Auth Helpers Cookie-Namen
+    const projectRef = process.env.NEXT_PUBLIC_SUPABASE_URL?.split('//')[1]?.split('.')[0]
+    const accessTokenKey = `sb-${projectRef}-auth-token`
+    
+    const accessToken = cookieStore.get(accessTokenKey)
     
     if (!accessToken?.value) {
+      console.log('No access token found in cookies')
       return null
     }
 
@@ -51,8 +57,17 @@ export async function getServerSession(): Promise<AuthUser | null> {
       return null
     }
 
+    // Token ist ein JSON String mit access_token
+    let tokenValue: string
+    try {
+      const parsed = JSON.parse(accessToken.value)
+      tokenValue = parsed.access_token || parsed
+    } catch {
+      tokenValue = accessToken.value
+    }
+
     // Token verifizieren
-    const decoded = jwt.verify(accessToken.value, jwtSecret) as any
+    const decoded = jwt.verify(tokenValue, jwtSecret) as any
     
     if (!decoded.sub || !decoded.email) {
       return null
